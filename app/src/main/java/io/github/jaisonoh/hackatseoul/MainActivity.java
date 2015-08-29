@@ -1,18 +1,17 @@
 package io.github.jaisonoh.hackatseoul;
 
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
-import io.github.jaisonoh.hackatseoul.ble.BleListAdapter;
+import io.github.jaisonoh.hackatseoul.adapter.BleListAdapter;
 import io.github.jaisonoh.hackatseoul.ble.BleScanner;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -27,20 +26,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        TextView toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
+
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            toolbarTitle.setText(getSupportActionBar().getTitle());
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+
         mBleListAdapter = new BleListAdapter(this);
         mBleScanner = new BleScanner(this, BluetoothAdapter.getDefaultAdapter(), mBleListAdapter);
 
-        Button btn_scan = (Button) findViewById(R.id.btn_scan);
-        btn_scan.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_scan:
-                Intent intent = new Intent(this, SettingActivity.class);
-                startActivity(intent);
-                break;
         }
     }
 
@@ -65,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingActivity.class);
+            startActivity(intent);
             return true;
         }
 

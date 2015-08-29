@@ -17,4 +17,8 @@ public class DataContainer
 
         return null;
     }
+
+    public ArrayList<Beacon> getBeacons() {
+        return beacons;
+    }
 }

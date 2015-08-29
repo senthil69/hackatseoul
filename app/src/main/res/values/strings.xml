@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">hackatseoul</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="setting_activity">Setting</string>
+
     <string name="action_settings">Settings</string>
 </resources>

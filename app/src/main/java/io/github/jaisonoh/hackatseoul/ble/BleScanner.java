@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
+import io.github.jaisonoh.hackatseoul.adapter.BleListAdapter;
+
 /**
  * Created by jaisonoh on 2015. 8. 20..
  */

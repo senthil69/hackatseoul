@@ -32,24 +32,6 @@ public class Beacon {
         this.pos_y = pos_y;
     }
 
-    public Beacon(String address, String uuid, String major, String minor, int pos_x, int pos_y) {
-        this.address = address;
-        this.uuid = uuid;
-        this.major = major;
-        this.minor = minor;
-        this.pos_x = pos_x;
-        this.pos_y = pos_y;
-    }
-
-    public Beacon(String name, String address, int pos_x, int pos_y) {
-        this.name = name;
-        this.address = address;
-        this.pos_x = pos_x;
-        this.pos_y =pos_y;
-    }
-
-
-
     public Beacon(int beacon_id, String address, int pos_x, int pos_y) {
         this.beacon_id = beacon_id;
         this.address = address;
@@ -57,23 +39,6 @@ public class Beacon {
         this.pos_y =pos_y;
     }
 
-
-
-
-    public JSONObject beaconJSONObject() {
-        JSONObject beacon = new JSONObject();
-
-        try {
-            beacon.put("ad_data", name);
-            beacon.put("mac_addr", address);
-            beacon.put("x", pos_x);
-            beacon.put("y", pos_y);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Log.d("test", beacon.toString());
-        return beacon;
-    }
 
     public int getBeacon_id() {
         return beacon_id;

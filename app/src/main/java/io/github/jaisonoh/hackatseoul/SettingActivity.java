@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,12 +14,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import io.github.jaisonoh.hackatseoul.ble.BleListAdapter;
+import io.github.jaisonoh.hackatseoul.adapter.BeaconListAdapter;
+import io.github.jaisonoh.hackatseoul.adapter.BleListAdapter;
 import io.github.jaisonoh.hackatseoul.ble.BleScanner;
 import io.github.jaisonoh.hackatseoul.model.Beacon;
 import io.github.jaisonoh.hackatseoul.model.DataContainer;
+import io.github.jaisonoh.hackatseoul.model.Preference;
 import io.github.jaisonoh.hackatseoul.widget.CanvasView;
 
 /**
@@ -25,33 +30,75 @@ import io.github.jaisonoh.hackatseoul.widget.CanvasView;
  */
 public class SettingActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static DataContainer mDataContainer = new DataContainer();
+
     private BleScanner mBleScanner;
     private BleListAdapter mBleListAdapter;
+    private Preference mPreference;
 
     private Button btn_scan;
-    public static DataContainer mDataContainer = new DataContainer();
-    private CanvasView m_mapView;
+    private CanvasView mMapView;
+    private ListView mListView;
 
     private int pos_x;
     private int pos_y;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_setting);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        TextView toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
+
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            toolbarTitle.setText(getSupportActionBar().getTitle());
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setElevation(0);
+
+        }
+
+        mMapView = (CanvasView)findViewById(R.id.map);
+        mMapView.setDataContainer(mDataContainer);
+        mListView = (ListView) findViewById(R.id.beacon_list);
+        showBeacons();
+
+
+
+        Button beaconAdd = (Button) findViewById(R.id.btn_beacon_add);
+        beaconAdd.setOnClickListener(this);
 
         mBleListAdapter = new BleListAdapter(this);
         mBleScanner = new BleScanner(this, BluetoothAdapter.getDefaultAdapter(), mBleListAdapter);
+    }
 
-        Button btn_scan = (Button) findViewById(R.id.btn_scan);
-        btn_scan.setOnClickListener(this);
+    private void showBeacons() {
+        mPreference = new Preference(this);
+        int index = mPreference.getPreferenceInt("beacon_number");
+
+        if(index > 0) {
+            mDataContainer.beacons.clear();
+            for(int i=0; i<index; i++) {
+                int id = mPreference.getPreferenceInt("beacon_id" + i);
+                String mac = mPreference.getPreferenceString("beacon_mac" + i);
+                int x = mPreference.getPreferenceInt("beacon_x" + i);
+                int y = mPreference.getPreferenceInt("beacon_y" + i);
+
+                Beacon beacons = new Beacon(id, mac, x, y);
+                mDataContainer.beacons.add(beacons);
+            }
+
+            mListView.setAdapter(new BeaconListAdapter(getApplicationContext(), mDataContainer.getBeacons()));
+            mMapView.invalidate();
+        }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_scan:
+            case R.id.btn_beacon_add:
                 mBleScanner.scanLeDevice(true);
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
                 alertBuilder.setTitle("Scan");
@@ -70,7 +117,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                     public void onClick(DialogInterface dialog, int which) {
                         mBleScanner.scanLeDevice(false);
 
-                        final String beaconMac = mBleScanner.getBleListAdapter().getItem(which).toString();
+                        final String mac = mBleScanner.getBleListAdapter().getItem(which).toString();
 
                         AlertDialog.Builder innBuilder = new AlertDialog.Builder(SettingActivity.this);
                         LayoutInflater inflater = LayoutInflater.from(SettingActivity.this);
@@ -83,8 +130,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
                         mDataContainer.beacons.clear();
 
-                        TextView macText = (TextView) v.findViewById(R.id.mac);
-                        macText.setText("Beacon : " + beaconMac);
+                        final TextView macText = (TextView) v.findViewById(R.id.mac);
+                        macText.setText("Beacon : " + mac);
 
                         final EditText xPoint = (EditText) v.findViewById(R.id.x);
                         final EditText yPoint = (EditText) v.findViewById(R.id.y);
@@ -103,7 +150,6 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                                     case MotionEvent.ACTION_DOWN:
                                         xPoint.setText(Integer.toString(x));
                                         yPoint.setText(Integer.toString(y));
-
 
                                         Beacon newBeacon = new Beacon(x, y);
                                         mDataContainer.beacons.add(newBeacon);
@@ -140,8 +186,18 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
 
+                                        int index = mPreference.getPreferenceInt("beacon_number");
+
+                                        mPreference.putPreference("beacon_id"+index,index);
+                                        mPreference.putPreference("beacon_mac"+index, mac);
+                                        mPreference.putPreference("beacon_x"+index, pos_x);
+                                        mPreference.putPreference("beacon_y"+index, pos_y);
+
+                                        mPreference.putPreference("beacon_number", index+1);
+
+
                                         dialog.dismiss();
-                                        onResume();
+                                        showBeacons();
                                     }
                                 });
                         innBuilder.show();
@@ -155,7 +211,6 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -172,7 +227,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.home) {
+            finish();
             return true;
         }
 

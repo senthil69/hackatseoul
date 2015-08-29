@@ -1,4 +1,4 @@
-package io.github.jaisonoh.hackatseoul.ble;
+package io.github.jaisonoh.hackatseoul.adapter;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
