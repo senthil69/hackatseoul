@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:gravity="center"
+        android:background="@android:color/white">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Beacon Management"
+            android:textStyle="bold"/>
+        <Button
+            android:id="@+id/add_beacon"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            android:textSize="14sp"
+            android:background="@color/colorPrimary"
+            android:textColor="#FFFFFF"
+            android:text="Add" />
+        <RelativeLayout
+            android:id="@+id/map_region"
+            android:layout_marginTop="10dp"
+            android:layout_width="600px"
+            android:layout_height="492px">
+            <io.github.jaisonoh.theflash.common.widget.CanvasView
+                android:id="@+id/map"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/map"/>
+        </RelativeLayout>
+    </LinearLayout>
+    <ListView
+        android:id="@+id/beacon_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="#FFFFFF">
+    </ListView>
+</LinearLayout>
